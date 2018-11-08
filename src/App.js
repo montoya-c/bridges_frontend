@@ -1,28 +1,64 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import {BrowserRouter, Switch, Route} from 'react-router-dom';
+import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom'
+// import logo from './logo.svg';
 import './App.css';
+import Home from './Components/Home.js'
+import Login from './Components/Login.js';
+import SignUp from './Components/SignUp.js';
+import UserResourcesList from './Components/UserResourcesList';
+import ResourceForm from './Components/ResourceForm';
+import UpdateResourceForm from './Components/UpdateResourceForm';
+import PrivateRoute from './Components/PrivateRoute';
+import CategoriesList from './Components/CategoriesList';
+import CategoryCard from './Components/CategoryCard';
+import ResourceDetail from './Components/ResourceDetail'
+
+
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        <BrowserRouter>
+          <Switch>
+            {
+              // "/categories" to Categories
+              // "/category/:id" to Category
+              // "/resource/:id" to Resource
+              // "/login" to Login
+              // "/signup" to SignUp
+              // "/my-resources"
+              // "/add-resource" to AddResource
+              // "/edit-resource/:id" to EditResource
+              // "/" redirect to /categories or /my-resources
+              null
+            }
+            <Route path = "/Home" component={Home}/>
+            <Route path = "/categories" component={CategoriesList}/>
+            <Route path = "/category/:id" component={CategoryCard}/>
+            <Route path = "/resource/:id" component={ResourceDetail}/>
+            <Route path = "/login" component={Login}/>
+            <Route path = "/signup" component={SignUp}/>
+            <Route path = "/my-resources" component={UserResourcesList}/>
+            <Route path = "/add-resource" component={ResourceForm}/>
+            <Route path = "/edit-resource" component={UpdateResourceForm}/>
+            <Route
+                path="/"
+                render={() => (
+                  <Redirect
+                    to={{
+                      pathname: localStorage.jwt ? '/my-resources' : '/categories'
+                    }}
+                  />
+                )}
+              />
+          </Switch>
+        </BrowserRouter>
       </div>
     );
   }
 }
 
-export default App;
+export default connect() (App);
