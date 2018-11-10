@@ -1,49 +1,80 @@
 import React, { Component} from 'react';
 import { connect } from 'react-redux';
-import { Form } from 'semantic-ui-react';
+import { Form, Button } from 'semantic-ui-react';
+import {Link} from 'react-router-dom';
 
 
 
 class ResourceForm extends Component {
-  render(){
 
+  componentDidMount(){
+    this.props.fetchNewResource()
+  }
+
+  render(){
     return(
+      <div>
       <div>
         <h1>form that allows adding resource can also cancel to exit and redirect to my resources page</h1>
       </div>
-      // <Form>
-      //   <Form.Group>
-      //     <Form.Input fluid label='Program Name' placeholder='Program Name' />
-      //     <Form.TextArea label='Description' placeholder='Tell us more about the services you offer.' />
-      //     <Form.Select fluid label='Gender' options={options} placeholder='Gender' />
-      //   </Form.Group>
-      //   <Form.Group inline>
-      //     <label>Category Type</label>
-      //     <Form.Radio
-      //       label='Small'
-      //       value='sm'
-      //       checked={value === 'sm'}
-      //       onChange={this.handleChange}
-      //     />
-      //     <Form.Radio
-      //       label='Medium'
-      //       value='md'
-      //       checked={value === 'md'}
-      //       onChange={this.handleChange}
-      //     />
-      //     <Form.Radio
-      //       label='Large'
-      //       value='lg'
-      //       checked={value === 'lg'}
-      //       onChange={this.handleChange}
-      //     />
-      //   </Form.Group>
-      //   <Form.TextArea label='About' placeholder='Tell us more about you...' />
-      //   <Form.Checkbox label='I agree to the Terms and Conditions' />
-      //   <Form.Button>Submit</Form.Button>
-      // </Form>
+      <Form>
+          <Form.Input fluid label='Program Name' placeholder='Program Name' />
+          <Form.TextArea label='Description' placeholder='Give a summary about the services you provide.' />
+          <Form.TextArea label='Services' placeholder='Include a list of the type of services included.' />
+          <Form.TextArea label='Eligibility' placeholder='Include eligibility requirements.' />
+            <label>Category</label>
+            <br/>
+            Please check all the boxes that apply.
+          {this.props.categories.map(category =>(
+          <Form.Checkbox label={category.details.name}
+          />  ))}
+          <br/>
+          <br/>
+          <label>Contact Info</label>
+          <br/>
+          <br/>
+          <Form.Group widths='equal'>
+            <Form.TextArea label='Address:' placeholder='Address' />
+            <Form.TextArea label='Telephone' placeholder='Telephone' />
+            <Form.TextArea  label='Website' placeholder='Website' />
+          </Form.Group>
+          <Form.TextArea label='The following languages are spoken at our agency/organization:' placeholder='List languages that are available to clients' />
+          <Form.Group>
+          <Link to ="/my-resources"><Form.Button onClick={this.props.createNewResource}>Cancel</Form.Button></Link>
+          <Form.Button onClick={this.props.createNewResource}>Submit</Form.Button>
+          </Form.Group>
+      </Form>
+      <br/>
+      </div>
     )
   }
-
 }
-export default connect() (ResourceForm)
+
+
+const mapStateToProps = (state) => {
+  return{
+    categories: state.categories,
+    newResource: state.newResource
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return{
+    fetchNewResource(resourceAttributes){
+      dispatch({
+        type: 'SAVE_NEW_RESOURCE',
+        payload: resourceAttributes
+      })
+    },
+    createNewResource(){
+      dispatch({
+        type: 'CREATE_NEW_RESOURCE'
+      })
+    }
+  }
+}
+
+
+
+
+export default connect(mapStateToProps, mapDispatchToProps) (ResourceForm)

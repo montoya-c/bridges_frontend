@@ -36,7 +36,18 @@ const defaultState = {
       resources:[]
     },
     selectedResource: {},
-    newResource: {},
+    newResource: {
+      program_name: '',
+      description: '',
+      services: '',
+      address: '',
+      telephone: '',
+      website: '',
+      hours: '',
+      eligibility: '',
+      language_spoken: '',
+      categories:[]
+    },
     selectedLanguage: 'English',
     categories: []
 }
@@ -106,7 +117,29 @@ const reducer = (currentState = defaultState, action) => {
         case 'SAVE_SELECTED_CATEGORY':
         newState.selectedCategory = action.payload
         break;
-
+        case 'FETCH_SELECTED_RESOURCE':
+        fetch(`http://localhost:3001/api/v1/resources/${action.id}?language=${newState.selectedLanguage}`,{
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }})
+          .then(resp => resp.json())
+          .then(payload => store.dispatch({type: 'SAVE_SELECTED_RESOURCE', payload: payload}))
+          break;
+          case 'SAVE_SELECTED_RESOURCE':
+          newState.selectedResource = action.payload
+          break;
+          case 'FETCH_NEW_RESOURCE':
+            fetch('https://localhost:3001/api/v1/users',{
+              method: 'POST',
+              headers:{
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(newState.newResource)
+            })
+              .then(resp => resp.json())
+              .then(payload => store.dispatch({ type: 'CREATE_NEW_RESOURCE', payload: payload}))
+            break;
 
     }
     return newState

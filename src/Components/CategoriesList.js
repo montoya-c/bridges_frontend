@@ -41,13 +41,6 @@ class CategoriesList extends Component {
   }
 }
 
-// <Link to =`/category/${:id}`>{category.details.name}</Link>
-// <ul>
-// {this.props.categories.map(category =>(
-//   <li>{category.details ? category.details.name : 'Unnamed'}</li>
-// ))}
-// </ul>
-
   const mapStateToProps = (state) => {
     return{
       categories: state.categories
@@ -57,7 +50,7 @@ class CategoriesList extends Component {
   const mapDispatchToProps = (dispatch) => {
 
     return{
-        
+
       fetchCategories(){
         dispatch({
           type: 'RENDER_CATEGORIES'
