@@ -5,6 +5,8 @@ import {
     Container,
     Menu,
     Card,
+    Button,
+    Icon,
 } from "semantic-ui-react";
 import {Link} from 'react-router-dom';
 
@@ -22,6 +24,12 @@ class CategoriesList extends Component {
       <div className="App">
           <div className="App-header">
                       <Header inverted as="h1">Bridges-HTX</Header>
+                      <br/>
+                      <br/>
+                      <Button primary size='huge'>
+                        Get Started
+                        <Icon name='right arrow' />
+                      </Button>
           </div>
           <Container>
             <Menu tabular size="massive">

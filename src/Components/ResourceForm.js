@@ -1,44 +1,62 @@
 import React, { Component} from 'react';
 import { connect } from 'react-redux';
-import { Form, Button } from 'semantic-ui-react';
+import { Form, Button, Tab } from 'semantic-ui-react';
 import {Link} from 'react-router-dom';
-
 
 
 class ResourceForm extends Component {
 
   componentDidMount(){
-    this.props.fetchNewResource()
+    //this.props.fetchNewResource()
+    this.props.fetchCategories()
+  }
+
+  renderForm(languageIndex){
+    return (
+      <div>
+        <Form.Input fluid label='Program Name' placeholder='Program Name' onChange={e => this.props.updateNewResource(languageIndex, "program_name", e.target.value)} />
+        <Form.TextArea label='Description' placeholder='Give a summary about the services you provide.' onChange={e => this.props.updateNewResource(languageIndex, "description", e.target.value)
+        } />
+        <Form.TextArea label='Services' placeholder='Include a list of the type of services included.' onChange={e => this.props.updateNewResource(languageIndex, "services", e.target.value)}/>
+        <Form.TextArea label='Eligibility' placeholder='Include eligibility requirements.' onChange={e => this.props.updateNewResource(languageIndex, "eligibility", e.target.value)} />
+
+        <br/>
+        <br/>
+        <label>Contact Info</label>
+        <br/>
+        <br/>
+        <Form.Group widths='equal'>
+          <Form.TextArea label='Address:' placeholder='Address' onChange={e => this.props.updateNewResource(languageIndex, "address", e.target.value)}/>
+          <Form.TextArea label='Telephone' placeholder='Telephone' onChange={e => this.props.updateNewResource(languageIndex, "telephone", e.target.value)}/>
+          <Form.TextArea  label='Website' placeholder='Website' onChange={e => this.props.updateNewResource(languageIndex, "website", e.target.value)}/>
+        </Form.Group>
+        <Form.TextArea label='The following languages are spoken at our agency/organization:' placeholder='List languages that are available to clients' onChange={e => this.props.updateNewResource(languageIndex, "language_spoken", e.target.value)} />
+
+    </div>
+  )
   }
 
   render(){
+    const panes = [
+      { menuItem: 'English', pane: this.renderForm(0)},
+      { menuItem: 'Spanish', pane: this.renderForm(1) }
+
+      /* if language_id = 0 then renderForm(0)*/
+
+    ]
     return(
       <div>
       <div>
         <h1>form that allows adding resource can also cancel to exit and redirect to my resources page</h1>
       </div>
       <Form>
-          <Form.Input fluid label='Program Name' placeholder='Program Name' />
-          <Form.TextArea label='Description' placeholder='Give a summary about the services you provide.' />
-          <Form.TextArea label='Services' placeholder='Include a list of the type of services included.' />
-          <Form.TextArea label='Eligibility' placeholder='Include eligibility requirements.' />
-            <label>Category</label>
+        <Tab panes={panes} renderActiveOnly={false} />
+          <label>Category</label>
             <br/>
             Please check all the boxes that apply.
           {this.props.categories.map(category =>(
-          <Form.Checkbox label={category.details.name}
-          />  ))}
-          <br/>
-          <br/>
-          <label>Contact Info</label>
-          <br/>
-          <br/>
-          <Form.Group widths='equal'>
-            <Form.TextArea label='Address:' placeholder='Address' />
-            <Form.TextArea label='Telephone' placeholder='Telephone' />
-            <Form.TextArea  label='Website' placeholder='Website' />
-          </Form.Group>
-          <Form.TextArea label='The following languages are spoken at our agency/organization:' placeholder='List languages that are available to clients' />
+            <Form.Checkbox label={category.details.name} onChange={e => this.props.toggleCategory(category.id)}/>
+          ))}
           <Form.Group>
           <Link to ="/my-resources"><Form.Button onClick={this.props.createNewResource}>Cancel</Form.Button></Link>
           <Form.Button onClick={this.props.createNewResource}>Submit</Form.Button>
@@ -62,13 +80,24 @@ const mapDispatchToProps = (dispatch) => {
   return{
     fetchNewResource(resourceAttributes){
       dispatch({
-        type: 'SAVE_NEW_RESOURCE',
-        payload: resourceAttributes
+        type: 'FETCH_NEW_RESOURCE',
       })
     },
-    createNewResource(){
+    updateNewResource(languageIndex, key, value){
       dispatch({
-        type: 'CREATE_NEW_RESOURCE'
+        type: 'POPULATE_NEW_RESOURCE',
+        payload: { languageIndex, key,  value }
+      })
+    },
+    fetchCategories(){
+      dispatch({
+        type: 'RENDER_CATEGORIES'
+      })
+    },
+    toggleCategory(categoryID){
+      dispatch({
+        type: 'TOGGLE_CATEGORY',
+        payload: categoryID
       })
     }
   }

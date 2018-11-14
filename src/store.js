@@ -14,7 +14,7 @@ let currentUser;
   }
 
 const defaultState = {
-    jwt: localStorage.jwt || false,
+    jwt: localStorage.jwt && localStorage.jwt != 'undefined' ? localStorage.jwt : false,
     newUser: {
         username: '',
         password: '',
@@ -37,19 +37,37 @@ const defaultState = {
     },
     selectedResource: {},
     newResource: {
-      program_name: '',
-      description: '',
-      services: '',
-      address: '',
-      telephone: '',
-      website: '',
-      hours: '',
-      eligibility: '',
-      language_spoken: '',
-      categories:[]
+      details_attributes: [
+        {
+          language_id: 1,
+          program_name: '',
+          description: '',
+          services: '',
+          address: '',
+          telephone: '',
+          website: '',
+          hours: '',
+          eligibility: '',
+          language_spoken: '',
+        },
+        {
+          language_id: 0,
+          program_name: '',
+          description: '',
+          services: '',
+          address: '',
+          telephone: '',
+          website: '',
+          hours: '',
+          eligibility: '',
+          language_spoken: '',
+        }
+      ],
+      category_ids:[]
     },
     selectedLanguage: 'English',
-    categories: []
+    categories: [],
+    isEditing: false
 }
 
 
@@ -73,15 +91,29 @@ const reducer = (currentState = defaultState, action) => {
           .then(resp => resp.json())
           .then(payload => store.dispatch({ type: 'LOGIN_USER', payload: payload}))
         break;
+      case 'FETCH_USER':
+        fetch('http://localhost:3001/api/v1/profile',{
+          method: 'GET',
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${newState.jwt}`
+          }
+        })
+          .then(resp => resp.json())
+          .then(user => store.dispatch({type: 'SAVE_USER', payload: user}))
+        break;
+        case 'SAVE_USER':
+          newState.currentUser = action.payload
+        break
       case 'ATTEMPT_TO_LOGIN_USER':
-        fetch('https://localhost:3001/api/v1/login',{
+        fetch('http://localhost:3001/api/v1/login',{
           method: 'POST',
           headers:{
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(newState.currentUser)
         })
-          .then(resp => resp.json)
+          .then(resp => resp.json())
           .then(payload => store.dispatch({type: 'LOGIN_USER', payload: payload}))
         break;
       case 'LOGIN_USER':
@@ -130,7 +162,7 @@ const reducer = (currentState = defaultState, action) => {
           newState.selectedResource = action.payload
           break;
           case 'FETCH_NEW_RESOURCE':
-            fetch('https://localhost:3001/api/v1/users',{
+            fetch('http://localhost:3001/api/v1/resources',{
               method: 'POST',
               headers:{
                 'Content-Type': 'application/json'
@@ -138,14 +170,63 @@ const reducer = (currentState = defaultState, action) => {
               body: JSON.stringify(newState.newResource)
             })
               .then(resp => resp.json())
-              .then(payload => store.dispatch({ type: 'CREATE_NEW_RESOURCE', payload: payload}))
+              .then(payload => store.dispatch({ type: 'SAVE_SELECTED_RESOURCE', payload: payload}))
             break;
+            case 'RENDER_USER_RESOURCE':
+              // fetch(`http://localhost:3001/api/v1/users/${}`,{
+              //   method: 'GET',
+              //   headers:{
+              //     'Content-Type': 'application/json'
+              //   }})
+              //   .then(resp => resp.json())
+              //   .then(payload => store.dispatch({ type: 'DISPLAY_USER_RESOURCES', payload: payload}))
+            break;
+            case 'DISPLAY_USER_RESOURCES':
+              newState.resources = action.payload
+            break;
+          case 'SELECT_RESOURCE':
+            newState.selectedResource = action.payload
+          break;
+          case 'POPULATE_NEW_RESOURCE':
+          let { languageIndex, key, value } = action.payload
+            let new_details_attributes = [ ...newState.newResource.details_attributes]
+            new_details_attributes[languageIndex][key] = value
+            newState.newResource = {
+              ...newState.newResource,
+              details_attributes: new_details_attributes
+            }
+        break;
+        case 'TOGGLE_CATEGORY':
+          let cat_ids = newState.newResource.category_ids;
+          //is it there already?
+          cat_ids.includes(action.payload) ?
+            //yes, take it out
+            newState.newResource.category_ids.splice(cat_ids.indexOf(action.payload), 1)
+            :
+            newState.newResource.category_ids.push(action.payload)
+            //no, add it
+        break;
+        case 'FETCH_EDIT_RESOURCE':
+        fetch(`http://localhost:3001/api/v1/resources/${action.id}`,{
+          method: 'PATCH',
+          headers:{
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(newState.newResource)
+        })
+          .then(resp => resp.json())
+          .then(payload => store.dispatch({ type: 'SAVE_SELECTED_RESOURCE', payload: payload}))
+        break;
 
+
+          break;
     }
     return newState
 }
 
 
 const store = createStore( reducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
+
+if(defaultState.jwt) store.dispatch({type:'FETCH_USER'})
 
 export { store }
