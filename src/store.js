@@ -35,11 +35,10 @@ const defaultState = {
       },
       resources:[]
     },
-    selectedResource: {},
-    newResource: {
-      details_attributes: [
+    selectedResource: {
+      resource_details_attributes: [
         {
-          language_id: 1,
+          language_id: 29,
           program_name: '',
           description: '',
           services: '',
@@ -51,7 +50,36 @@ const defaultState = {
           language_spoken: '',
         },
         {
-          language_id: 0,
+          language_id: 30,
+          program_name: '',
+          description: '',
+          services: '',
+          address: '',
+          telephone: '',
+          website: '',
+          hours: '',
+          eligibility: '',
+          language_spoken: '',
+        }
+      ],
+      category_ids:[]
+    },
+    newResource: {
+      resource_details_attributes: [
+        {
+          language_id: 29,
+          program_name: '',
+          description: '',
+          services: '',
+          address: '',
+          telephone: '',
+          website: '',
+          hours: '',
+          eligibility: '',
+          language_spoken: '',
+        },
+        {
+          language_id: 30,
           program_name: '',
           description: '',
           services: '',
@@ -153,19 +181,22 @@ const reducer = (currentState = defaultState, action) => {
         fetch(`http://localhost:3001/api/v1/resources/${action.id}?language=${newState.selectedLanguage}`,{
           method: 'GET',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization':`Bearer ${localStorage.jwt}`
           }})
           .then(resp => resp.json())
           .then(payload => store.dispatch({type: 'SAVE_SELECTED_RESOURCE', payload: payload}))
           break;
           case 'SAVE_SELECTED_RESOURCE':
+          action.payload.resource_details_attributes = action.payload.resource_details
           newState.selectedResource = action.payload
           break;
           case 'FETCH_NEW_RESOURCE':
             fetch('http://localhost:3001/api/v1/resources',{
               method: 'POST',
               headers:{
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.jwt}`
               },
               body: JSON.stringify(newState.newResource)
             })
@@ -185,16 +216,26 @@ const reducer = (currentState = defaultState, action) => {
               newState.resources = action.payload
             break;
           case 'SELECT_RESOURCE':
+            action.payload.resource_details_attributes = action.payload.resource_details
             newState.selectedResource = action.payload
           break;
           case 'POPULATE_NEW_RESOURCE':
-          let { languageIndex, key, value } = action.payload
-            let new_details_attributes = [ ...newState.newResource.details_attributes]
+          var { languageIndex, key, value } = action.payload
+            var new_details_attributes = [ ...newState.newResource.resource_details_attributes]
             new_details_attributes[languageIndex][key] = value
             newState.newResource = {
               ...newState.newResource,
-              details_attributes: new_details_attributes
+              resource_details_attributes: new_details_attributes
             }
+            break
+          case 'POPULATE_UPDATED_RESOURCE':
+            var { languageIndex, key, value } = action.payload
+              var new_details_attributes = [ ...newState.selectedResource.resource_details_attributes]
+              new_details_attributes[languageIndex][key] = value
+              newState.selectedResource = {
+                ...newState.selectedResource,
+                resource_details_attributes: new_details_attributes
+              }
         break;
         case 'TOGGLE_CATEGORY':
           let cat_ids = newState.newResource.category_ids;
@@ -205,21 +246,53 @@ const reducer = (currentState = defaultState, action) => {
             :
             newState.newResource.category_ids.push(action.payload)
             //no, add it
+            newState.newResource= JSON.parse(JSON.stringify(newState.newResource))
         break;
         case 'FETCH_EDIT_RESOURCE':
         fetch(`http://localhost:3001/api/v1/resources/${action.id}`,{
           method: 'PATCH',
           headers:{
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.jwt}`
+
           },
-          body: JSON.stringify(newState.newResource)
+          body: JSON.stringify(newState.selectedResource)
         })
           .then(resp => resp.json())
           .then(payload => store.dispatch({ type: 'SAVE_SELECTED_RESOURCE', payload: payload}))
         break;
+        case 'TOGGLE_CATEGORY_IN_EDIT':
+          let updated_category_ids =      newState.selectedResource.category_ids;
+          //is it there already?
+            updated_category_ids.includes(action.payload) ?
+            //yes, take it out
+            newState.selectedResource.category_ids.splice(updated_category_ids.indexOf(action.payload), 1)
+            :
+            newState.selectedResource.category_ids.push(action.payload)
+            //no, add
+            newState.selectedResource= JSON.parse(JSON.stringify(newState.selectedResource))
+        break;
+        case 'DESTROY_SELECTED_RESOURCE':
+        fetch(`http://localhost:3001/api/v1/resources/${action.id}`,{
+          method: 'DELETE',
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.jwt}`
+          }
+        })
+          .then(payload => store.dispatch({
+            type: 'REMOVE_SELECTED_RESOURCE',
+            id: action.id }))
+      break;
+      case 'REMOVE_SELECTED_RESOURCE':
+        newState.currentUser = {
+          ...newState.currentUser,
+          resources: newState.currentUser.resources.filter(resource => resource.id != action.id)
+        }
+      break;
 
 
-          break;
+
     }
     return newState
 }

@@ -1,23 +1,27 @@
 import React, { Component} from 'react'
 import { connect } from 'react-redux';
-import { Form, Button, Tab } from 'semantic-ui-react';
-import {Link} from 'react-router-dom';
+import { Form, Button, Tab, Menu, Icon, Container } from 'semantic-ui-react';
+import {Link, withRouter} from 'react-router-dom';
 
 
 class UpdateResourceForm extends Component {
 
     componentDidMount(){
+      console.log(this.props)
       this.props.fetchCategories()
+      this.props.fetchSelectedResource(this.props.match.params.id)
     }
 
     renderForm(languageIndex){
+      let form = this.props.selectedResource.resource_details_attributes[languageIndex]
+      if(!this.props.selectedResource.details || !this.props.categories) return null
       return (
         <div>
-          <Form.Input fluid label='Program Name' placeholder='Program Name' value={this.props.selectedResource.program_name} onChange={e => this.props.editSelectedResource(languageIndex, "program_name", e.target.value)} />
-          <Form.TextArea label='Description' placeholder='Give a summary about the services you provide.' value={this.props.selectedResource.description} onChange={e => this.props.editSelectedResource(languageIndex, "description", e.target.value)
+          <Form.Input fluid label='Program Name' placeholder='Program Name' value={form.program_name} onChange={e => this.props.editSelectedResource(languageIndex, "program_name", e.target.value)} />
+          <Form.TextArea label='Description' placeholder='Give a summary about the services you provide.' value={form.description} onChange={e => this.props.editSelectedResource(languageIndex, "description", e.target.value)
           } />
-        <Form.TextArea label='Services' placeholder='Include a list of the type of services included.' value={this.props.selectedResource.services} onChange={e => this.props.editSelectedResource(languageIndex, "services", e.target.value)}/>
-          <Form.TextArea label='Eligibility' placeholder='Include eligibility requirements.' value={this.props.selectedResource.eligibility} onChange={e => this.props.editSelectedResource(languageIndex, "eligibility", e.target.value)} />
+        <Form.TextArea label='Services' placeholder='Include a list of the type of services included.' value={form.services} onChange={e => this.props.editSelectedResource(languageIndex, "services", e.target.value)}/>
+          <Form.TextArea label='Eligibility' placeholder='Include eligibility requirements.' value={form.eligibility} onChange={e => this.props.editSelectedResource(languageIndex, "eligibility", e.target.value)} />
 
           <br/>
           <br/>
@@ -25,37 +29,46 @@ class UpdateResourceForm extends Component {
           <br/>
           <br/>
           <Form.Group widths='equal'>
-            <Form.TextArea label='Address:' placeholder='Address' value={this.props.selectedResource.address} onChange={e => this.props.editSelectedResource(languageIndex, "address", e.target.value)}/>
-            <Form.TextArea label='Telephone' placeholder='Telephone' value={this.props.selectedResource.telephone} onChange={e => this.props.editSelectedResource(languageIndex, "telephone", e.target.value)}/>
-            <Form.TextArea  label='Website' placeholder='Website' value={this.props.selectedResource.website} onChange={e => this.props.editSelectedResource(languageIndex, "website", e.target.value)}/>
+            <Form.TextArea label='Address:' placeholder='Address' value={form.address} onChange={e => this.props.editSelectedResource(languageIndex, "address", e.target.value)}/>
+            <Form.TextArea label='Telephone' placeholder='Telephone' value={form.telephone} onChange={e => this.props.editSelectedResource(languageIndex, "telephone", e.target.value)}/>
+            <Form.TextArea  label='Website' placeholder='Website' value={form.website} onChange={e => this.props.editSelectedResource(languageIndex, "website", e.target.value)}/>
           </Form.Group>
-          <Form.TextArea label='The following languages are spoken at our agency/organization:' placeholder='List languages that are available to clients' value={this.props.selectedResource.language_spoken} onChange={e => this.props.editSelectedResource(languageIndex, "language_spoken", e.target.value)} />
-
+          <Form.TextArea label='The following languages are spoken at our agency/organization:' placeholder='List languages that are available to clients' value={form.language_spoken} onChange={e => this.props.editSelectedResource(languageIndex, "language_spoken", e.target.value)} />
       </div>
     )
   }
 
   render(){
     const panes = [
-      { menuItem: 'English', pane: this.renderForm(0) },
-      { menuItem: 'Spanish', pane: this.renderForm(1) }
+      { menuItem: 'English', render: () => this.renderForm(0) },
+      { menuItem: 'Spanish', render: () => this.renderForm(1) }
     ]
     return(
       <div>
       <div>
-        <h1>form that allows editing resource can also cancel to exit and redirect to my resources page</h1>
+          <Menu inverted size='large'>
+            <Container>
+              <Menu.Item position='right'>
+                <Button as='a'  style={{ marginLeft: '0.5em' }} onClick={e => { localStorage.clear(); window.location.reload() }}>
+                      Log Out
+                </Button>
+              </Menu.Item>
+            </Container>
+          </Menu>
       </div>
+      <br/>
+      <br/>
       <Form>
-        <Tab panes={panes} renderActiveOnly={false} />
+        <Tab panes={panes} renderActiveOnly={true} />
           <label>Category</label>
             <br/>
             Please check all the boxes that apply.
           {this.props.categories.map(category =>(
-            <Form.Checkbox label={category.details.name} onChange={e => this.props.toggleCategory(category.id)}/>
+            <Form.Checkbox checked={this.props.selectedResource.category_ids.includes(category.id)} label={category.details.name} onChange={e => this.props.toggleCategory(category.id)}/>
           ))}
           <Form.Group>
           <Link to ="/my-resources"><Form.Button onClick={this.props.createNewResource}>Cancel</Form.Button></Link>
-          <Form.Button onClick={this.props.createNewResource}>Submit</Form.Button>
+          <Form.Button onClick={e => this.props.fetchEditedSelectedResource(this.props.match.params.id)}>Submit</Form.Button>
           </Form.Group>
       </Form>
       </div>
@@ -72,9 +85,16 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return{
-    fetchEditedSelectedResource(resourceAttributes){
+    fetchEditedSelectedResource(id){
       dispatch({
         type:'FETCH_EDIT_RESOURCE',
+        id:id
+      })
+    },
+    fetchSelectedResource(id){
+      dispatch({
+        type: 'FETCH_SELECTED_RESOURCE',
+        id:id
       })
     },
     editSelectedResource(languageIndex, key, value){
@@ -90,7 +110,7 @@ const mapDispatchToProps = (dispatch) => {
     },
     toggleCategory(categoryID){
       dispatch({
-        type: 'TOGGLE_CATEGORY',
+        type: 'TOGGLE_CATEGORY_IN_EDIT',
         payload: categoryID
       })
     }
@@ -98,4 +118,4 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 
-export default connect(mapStateToProps, mapDispatchToProps) (UpdateResourceForm)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps) (UpdateResourceForm))

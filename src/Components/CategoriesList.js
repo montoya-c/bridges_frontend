@@ -21,24 +21,30 @@ class CategoriesList extends Component {
 
     return(
       <div>
-      <div className="App">
-          <div className="App-header">
-                      <Header inverted as="h1">Bridges-HTX</Header>
-                      <br/>
-                      <br/>
-                      <Button primary size='huge'>
-                        Get Started
-                        <Icon name='right arrow' />
-                      </Button>
-          </div>
-          <Container>
-            <Menu tabular size="massive">
-              <Menu.Item name="Map" active={false}>Map</Menu.Item>
-              <Menu.Item name="categories" active={true}>Categories</Menu.Item>
+        <Menu
+              size='large'>
+              <Container>
+                <Menu.Item as='a'><Link to="/home">
+                  Home</Link>
+                </Menu.Item>
+                <Menu.Item as='a' active >About</Menu.Item>
+                <Menu.Item position='right'>
+                  <Link to="/add-resource"><Button as='a' >
+                    Add a Resourse
+                  </Button></Link>
+                <Button as='a'  style={{ marginLeft: '0.5em' }} onClick={e => { localStorage.clear(); window.location.reload() }}>
+                    Log Out
+                  </Button>
+                </Menu.Item>
+              </Container>
             </Menu>
-         </Container>
-       </div>
        <h1>Resources</h1>
+         <Container>
+           <Menu tabular size="massive">
+             <Menu.Item name="Map" active={false}>Map</Menu.Item>
+             <Menu.Item name="categories" active={true}>Categories</Menu.Item>
+           </Menu>
+        </Container>
           <Card.Group>
             {this.props.categories.map(category =>(
                 <Card fluid color='black' header={<Link to={{pathname:`/category/${category.id}`}}>{category.details.name}</Link>}/>

@@ -12,13 +12,15 @@ class ResourceForm extends Component {
   }
 
   renderForm(languageIndex){
+    let form = this.props.newResource.resource_details_attributes[languageIndex]
     return (
       <div>
-        <Form.Input fluid label='Program Name' placeholder='Program Name' onChange={e => this.props.updateNewResource(languageIndex, "program_name", e.target.value)} />
-        <Form.TextArea label='Description' placeholder='Give a summary about the services you provide.' onChange={e => this.props.updateNewResource(languageIndex, "description", e.target.value)
+        <Form.Input fluid label='Program Name' placeholder='Program Name' value={form.program_name} onChange={e => this.props.updateNewResource(languageIndex, "program_name", e.target.value)} />
+        <Form.TextArea label='Description' placeholder='Give a summary about the services you provide.' value={form.description} onChange={e => this.props.updateNewResource(languageIndex, "description", e.target.value)
         } />
-        <Form.TextArea label='Services' placeholder='Include a list of the type of services included.' onChange={e => this.props.updateNewResource(languageIndex, "services", e.target.value)}/>
-        <Form.TextArea label='Eligibility' placeholder='Include eligibility requirements.' onChange={e => this.props.updateNewResource(languageIndex, "eligibility", e.target.value)} />
+      <Form.TextArea label='Services' placeholder='Include a list of the type of services included.' value={form.services} onChange={e => this.props.updateNewResource(languageIndex, "services", e.target.value)}/>
+        <Form.TextArea label='Eligibility' placeholder='Include eligibility requirements.' value={form.eligibility}
+         onChange={e => this.props.updateNewResource(languageIndex, "eligibility", e.target.value)} />
 
         <br/>
         <br/>
@@ -26,11 +28,11 @@ class ResourceForm extends Component {
         <br/>
         <br/>
         <Form.Group widths='equal'>
-          <Form.TextArea label='Address:' placeholder='Address' onChange={e => this.props.updateNewResource(languageIndex, "address", e.target.value)}/>
-          <Form.TextArea label='Telephone' placeholder='Telephone' onChange={e => this.props.updateNewResource(languageIndex, "telephone", e.target.value)}/>
-          <Form.TextArea  label='Website' placeholder='Website' onChange={e => this.props.updateNewResource(languageIndex, "website", e.target.value)}/>
+          <Form.TextArea label='Address:' placeholder='Address' value={form.address} onChange={e => this.props.updateNewResource(languageIndex, "address", e.target.value)}/>
+          <Form.TextArea label='Telephone' placeholder='Telephone' value={form.telephone} onChange={e => this.props.updateNewResource(languageIndex, "telephone", e.target.value)}/>
+          <Form.TextArea  label='Website' placeholder='Website' value={form.website} onChange={e => this.props.updateNewResource(languageIndex, "website", e.target.value)}/>
         </Form.Group>
-        <Form.TextArea label='The following languages are spoken at our agency/organization:' placeholder='List languages that are available to clients' onChange={e => this.props.updateNewResource(languageIndex, "language_spoken", e.target.value)} />
+        <Form.TextArea label='The following languages are spoken at our agency/organization:' placeholder='List languages that are available to clients' value={form.language_spoken} onChange={e => this.props.updateNewResource(languageIndex, "language_spoken", e.target.value)} />
 
     </div>
   )
@@ -38,8 +40,8 @@ class ResourceForm extends Component {
 
   render(){
     const panes = [
-      { menuItem: 'English', pane: this.renderForm(0)},
-      { menuItem: 'Spanish', pane: this.renderForm(1) }
+      { menuItem: 'English', render: () => this.renderForm(0)},
+      { menuItem: 'Spanish', render: () => this.renderForm(1) }
 
       /* if language_id = 0 then renderForm(0)*/
 
@@ -47,10 +49,10 @@ class ResourceForm extends Component {
     return(
       <div>
       <div>
-        <h1>form that allows adding resource can also cancel to exit and redirect to my resources page</h1>
+
       </div>
       <Form>
-        <Tab panes={panes} renderActiveOnly={false} />
+        <Tab panes={panes} />
           <label>Category</label>
             <br/>
             Please check all the boxes that apply.
@@ -59,7 +61,7 @@ class ResourceForm extends Component {
           ))}
           <Form.Group>
           <Link to ="/my-resources"><Form.Button onClick={this.props.createNewResource}>Cancel</Form.Button></Link>
-          <Form.Button onClick={this.props.createNewResource}>Submit</Form.Button>
+          <Form.Button onClick={this.props.fetchNewResource}>Submit</Form.Button>
           </Form.Group>
       </Form>
       <br/>
@@ -98,6 +100,11 @@ const mapDispatchToProps = (dispatch) => {
       dispatch({
         type: 'TOGGLE_CATEGORY',
         payload: categoryID
+      })
+    },
+    fetchNewResource(){
+      dispatch({
+        type: 'FETCH_NEW_RESOURCE'
       })
     }
   }

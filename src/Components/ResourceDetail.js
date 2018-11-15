@@ -5,12 +5,15 @@ import {Link, withRouter} from 'react-router-dom';
 
 class ResourceDetail extends Component {
 
+  componentDidMount(){
+    this.props.fetchSelectedResource(this.props.match.params.id)
+  }
 
   render(){
     console.log(this.props)
       const wording = languages[this.props.selectedLanguage]
     return((
-       this.props.selectedResource &&
+       this.props.selectedResource.details &&
       <div>
         <button><Icon link name='close' onClick={ e=> this.props.history.goBack()}/></button>
         <br/>
@@ -40,54 +43,26 @@ class ResourceDetail extends Component {
 
     const languages = {
       "English":{
-        "Services:":"Services:"
-      },
-      "Spanish":{
-        "Services:":"Servicios:"
-      },
-      "English":{
-        "Eligibility:":"Eligibility:"
-      },
-      "Spanish":{
-        "Eligibility:":"Requisitos de Eligibildad:"
-      },
-      "English":{
-        "The following languages are spoken:":"The following languages are spoken:"
-      },
-      "Spanish":{
-        "The following languages are spoken:":"Se hablan los siguientes idiomas:"
-      },
-      "English":{
-        "Contact Info:":"Contact Info:"
-      },
-      "Spanish":{
-        "Contact Info:":"Información de Contacto"
-      },
-      "English":{
-        "Address:":"Address:"
-      },
-      "Spanish":{
-        "Address:":"Dirección:"
-      },
-      "English":{
-        "Telephone:":"Telephone:"
-      },
-      "Spanish":{
-        "Telephone:":"Teléfono"
-      },
-      "English":{
-        "Website:":"Website:"
-      },
-      "Spanish":{
-        "Website:":"Sitio Web:"
-      },
-      "English":{
+        "Services:":"Services:",
+        "Eligibility:":"Eligibility:",
+        "The following languages are spoken:":"The following languages are spoken:",
+        "Contact Info:":"Contact Info:",
+        "Address:":"Address:",
+        "Telephone:":"Telephone:",
+        "Website:":"Website:",
         "Hours:":"Hours:"
       },
       "Spanish":{
+        "Services:":"Servicios:",
+        "Eligibility:":"Requisitos de Eligibildad:",
+        "The following languages are spoken:":"Se hablan los siguientes idiomas:",
+        "Contact Info:":"Información de Contacto",
+        "Address:":"Dirección:",
+        "Telephone:":"Teléfono",
+        "Website:":"Sitio Web:",
         "Hours:":"Horarios:"
-      }
     }
+  }
 
 
 
@@ -99,14 +74,19 @@ class ResourceDetail extends Component {
 const mapStateToProps = (state, props) => {
   console.log(state.selectedCategory.resources)
   return{
-    selectedResource: state.selectedCategory.resources.find( resource => resource.id == props.match.params.id),
+    selectedResource: state.selectedResource,
     selectedLanguage: state.selectedLanguage
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return{
-
+      fetchSelectedResource(id){
+        dispatch ({
+          type: 'FETCH_SELECTED_RESOURCE',
+          id: id
+        })
+      }
   }
 }
 export default withRouter(connect(mapStateToProps, mapDispatchToProps) (ResourceDetail))

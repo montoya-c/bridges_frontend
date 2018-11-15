@@ -35,15 +35,15 @@ class App extends Component {
               // "/" redirect to /categories or /my-resources
               null
             }
-            <Route path = "/Home" component={Home}/>
+            <Route path = "/home" component={Home}/>
             <Route path = "/categories" component={CategoriesList}/>
             <Route path = "/category/:id" component={CategoryCard}/>
             <Route path = "/resource/:id" component={ResourceDetail}/>
             <Route path = "/login" component={Login}/>
             <Route path = "/signup" component={SignUp}/>
-            <Route path = "/my-resources" component={UserResourcesList}/>
-            <Route path = "/add-resource" component={ResourceForm}/>
-            <Route path = "/edit-resource" component={UpdateResourceForm}/>
+            <PrivateRoute path = "/my-resources" component={UserResourcesList}/>
+            <PrivateRoute path = "/add-resource" component={ResourceForm}/>
+            <PrivateRoute path = "/edit-resource/:id" component={UpdateResourceForm}/>
             <Route
                 path="/"
                 render={() => (
