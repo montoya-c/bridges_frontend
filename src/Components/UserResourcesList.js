@@ -41,12 +41,13 @@ class UserResourcesList extends Component {
           </Header>
         </div>
           <br/>
-          /* add if user has resources list if not logic  */
+
           <Grid columns={2}>
           <Grid.Row>
             <Grid.Column>
               <Card.Group>
-                {this.props.currentUser.resources.map(resource =>(
+                { this.props.currentUser.resources &&
+                  this.props.currentUser.resources.map(resource =>(
                 <Card>
                     <Card.Content>
                       <Card.Header>{resource.details.program_name}</Card.Header>

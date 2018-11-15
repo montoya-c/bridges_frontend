@@ -1,7 +1,8 @@
 import React, { Component} from 'react';
 import { connect } from 'react-redux';
 import { Icon, } from 'semantic-ui-react';
-import {Link, withRouter} from 'react-router-dom';
+import {Link, withRouter } from 'react-router-dom';
+import { languages } from '../wording';
 
 class ResourceDetail extends Component {
 
@@ -40,29 +41,29 @@ class ResourceDetail extends Component {
     ) || null)
   }
 }
-
-    const languages = {
-      "English":{
-        "Services:":"Services:",
-        "Eligibility:":"Eligibility:",
-        "The following languages are spoken:":"The following languages are spoken:",
-        "Contact Info:":"Contact Info:",
-        "Address:":"Address:",
-        "Telephone:":"Telephone:",
-        "Website:":"Website:",
-        "Hours:":"Hours:"
-      },
-      "Spanish":{
-        "Services:":"Servicios:",
-        "Eligibility:":"Requisitos de Eligibildad:",
-        "The following languages are spoken:":"Se hablan los siguientes idiomas:",
-        "Contact Info:":"Información de Contacto",
-        "Address:":"Dirección:",
-        "Telephone:":"Teléfono",
-        "Website:":"Sitio Web:",
-        "Hours:":"Horarios:"
-    }
-  }
+  //
+  //   const languages = {
+  //     "English":{
+  //       "Services:":"Services:",
+  //       "Eligibility:":"Eligibility:",
+  //       "The following languages are spoken:":"The following languages are spoken:",
+  //       "Contact Info:":"Contact Info:",
+  //       "Address:":"Address:",
+  //       "Telephone:":"Telephone:",
+  //       "Website:":"Website:",
+  //       "Hours:":"Hours:"
+  //     },
+  //     "Español":{
+  //       "Services:":"Servicios:",
+  //       "Eligibility:":"Requisitos de Eligibildad:",
+  //       "The following languages are spoken:":"Se hablan los siguientes idiomas:",
+  //       "Contact Info:":"Información de Contacto",
+  //       "Address:":"Dirección:",
+  //       "Telephone:":"Teléfono",
+  //       "Website:":"Sitio Web:",
+  //       "Hours:":"Horarios:"
+  //   }
+  // }
 
 
 

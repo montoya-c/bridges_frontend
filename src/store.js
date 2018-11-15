@@ -93,15 +93,18 @@ const defaultState = {
       ],
       category_ids:[]
     },
-    selectedLanguage: 'English',
-    categories: [],
-    isEditing: false
+    selectedLanguage: localStorage.language || 'English',
+    categories: []
 }
 
 
 const reducer = (currentState = defaultState, action) => {
   const newState = { ...currentState}
     switch (action.type){
+      case 'CHANGE_SELECTED_LANGUAGE':
+        localStorage.setItem('language', action.payload)
+        newState.selectedLanguage = action.payload
+      break
       case 'UPDATE_NEW_USER':
         newState.newUser = { ...newState.newUser, ...action.payload }
         break;
@@ -109,7 +112,7 @@ const reducer = (currentState = defaultState, action) => {
         newState.currentUser = { ...newState.currentUser, ...action.payload }
         break;
       case 'CREATE_NEW_USER':
-        fetch('https://localhost:3001/api/v1/users',{
+        fetch('http://localhost:3001/api/v1/users',{
           method: 'POST',
           headers:{
             'Content-Type': 'application/json'
@@ -117,7 +120,7 @@ const reducer = (currentState = defaultState, action) => {
           body: JSON.stringify(newState.newUser)
         })
           .then(resp => resp.json())
-          .then(payload => store.dispatch({ type: 'LOGIN_USER', payload: payload}))
+          .then(payload => store.dispatch({ type: 'LOGIN_USER', payload: payload, redirect:action.redirect}))
         break;
       case 'FETCH_USER':
         fetch('http://localhost:3001/api/v1/profile',{
@@ -149,6 +152,8 @@ const reducer = (currentState = defaultState, action) => {
         newState.jwt = action.payload.jwt
         localStorage.setItem("currentUser", JSON.stringify(newState.currentUser))
         localStorage.setItem("jwt", newState.jwt)
+        if(action.redirect) setTimeout(action.redirect)
+
         break;
       case 'LOGOUT_USER':
         localStorage.clear()
@@ -190,8 +195,18 @@ const reducer = (currentState = defaultState, action) => {
           case 'SAVE_SELECTED_RESOURCE':
           action.payload.resource_details_attributes = action.payload.resource_details
           newState.selectedResource = action.payload
+          if(action.redirect) setTimeout(action.redirect)
+
           break;
+          case 'SAVE_NEW_RESOURCE':
+          newState.currentUser.resources= [
+            ...newState.currentUser.resources,
+            action.payload
+          ]
+          if(action.redirect) setTimeout(action.redirect)
+          break
           case 'FETCH_NEW_RESOURCE':
+            console.log(action)
             fetch('http://localhost:3001/api/v1/resources',{
               method: 'POST',
               headers:{
@@ -201,7 +216,7 @@ const reducer = (currentState = defaultState, action) => {
               body: JSON.stringify(newState.newResource)
             })
               .then(resp => resp.json())
-              .then(payload => store.dispatch({ type: 'SAVE_SELECTED_RESOURCE', payload: payload}))
+              .then(payload => store.dispatch({ type: 'SAVE_NEW_RESOURCE', payload: payload, redirect: action.redirect}))
             break;
             case 'RENDER_USER_RESOURCE':
               // fetch(`http://localhost:3001/api/v1/users/${}`,{

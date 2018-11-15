@@ -1,6 +1,6 @@
 import React, { Component} from 'react';
 import { connect } from 'react-redux';
-import {Link} from 'react-router-dom';
+import {Link, withRouter} from 'react-router-dom';
 import { Button, Form } from 'semantic-ui-react'
 
 class SignUp extends Component{
@@ -13,11 +13,11 @@ class SignUp extends Component{
           <Form>
             <Form.Field>
               <label>Organization Name</label>
-              <input placeholder='organization Name'onChange={ e =>this.props.updateNewUser({username: e.target.value})} type="text" />
+              <input placeholder='organization Name'onChange={ e =>this.props.updateNewUser({organizationName: e.target.value})} type="text" />
             </Form.Field>
             <Form.Field>
               <label>Email</label>
-              <input placeholder='Email' onChange={ e =>this.props.updateNewUser({username: e.target.value})} type="text" />
+              <input placeholder='Email' onChange={ e =>this.props.updateNewUser({email: e.target.value})} type="text" />
             </Form.Field>
             <Form.Field>
               <label>Username</label>
@@ -25,9 +25,9 @@ class SignUp extends Component{
             </Form.Field>
             <Form.Field>
               <label>Password</label>
-              <input placeholder='Password' onChange={ e =>this.props.updateNewUser({username: e.target.value})} type="password"/>
+              <input placeholder='Password' onChange={ e =>this.props.updateNewUser({password: e.target.value})} type="password"/>
             </Form.Field>
-            <Button onClick={this.props.createNewUser} type='submit'>Submit</Button>
+            <Button onClick={e => this.props.createUser(this.props.history)} type='submit'>Submit</Button>
           </Form>
           <br/>
           <Link to ="/login">Login</Link>
@@ -52,13 +52,14 @@ const mapDispatchToProps = (dispatch) => {
       })
     },
 
-    createUser(){
+    createUser(history){
       dispatch({
-        type: 'CREATE_NEW_USER'
+        type: 'CREATE_NEW_USER',
+        redirect: () => history.push('/my-resources')
       })
 
     }
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SignUp);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SignUp));

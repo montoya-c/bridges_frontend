@@ -21,7 +21,8 @@ class CategoriesList extends Component {
 
     return(
       <div>
-        <Menu
+        {localStorage.jwt ?
+        (<Menu
               size='large'>
               <Container>
                 <Menu.Item as='a'><Link to="/home">
@@ -37,7 +38,26 @@ class CategoriesList extends Component {
                   </Button>
                 </Menu.Item>
               </Container>
-            </Menu>
+            </Menu>) : (
+              <Menu
+                    size='large'>
+                    <Container>
+                      <Menu.Item as='a'><Link to="/home">
+                        Home</Link>
+                      </Menu.Item>
+                      <Menu.Item as='a' active >About</Menu.Item>
+                        <Menu.Item as='a'>Connect</Menu.Item>
+                        <Menu.Item as='a'>Collaborate</Menu.Item>
+                      <Menu.Item position='right'>
+                        <Link to="/signup"><Button as='a' >
+                          Sign Up
+                        </Button></Link>
+                      <Link to="/login"><Button as='a'  style={{ marginLeft: '0.5em' }} >
+                          Log In
+                        </Button></Link>
+                      </Menu.Item>
+                    </Container>
+                  </Menu>)}
        <h1>Resources</h1>
          <Container>
            <Menu tabular size="massive">

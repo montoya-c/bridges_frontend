@@ -1,7 +1,7 @@
 import React, { Component} from 'react';
 import { connect } from 'react-redux';
 import { Form, Button, Tab } from 'semantic-ui-react';
-import {Link} from 'react-router-dom';
+import {Link, withRouter} from 'react-router-dom';
 
 
 class ResourceForm extends Component {
@@ -43,7 +43,7 @@ class ResourceForm extends Component {
       { menuItem: 'English', render: () => this.renderForm(0)},
       { menuItem: 'Spanish', render: () => this.renderForm(1) }
 
-      /* if language_id = 0 then renderForm(0)*/
+
 
     ]
     return(
@@ -61,7 +61,7 @@ class ResourceForm extends Component {
           ))}
           <Form.Group>
           <Link to ="/my-resources"><Form.Button onClick={this.props.createNewResource}>Cancel</Form.Button></Link>
-          <Form.Button onClick={this.props.fetchNewResource}>Submit</Form.Button>
+          <Form.Button onClick={e=> this.props.fetchNewResource(this.props.history)}>Submit</Form.Button>
           </Form.Group>
       </Form>
       <br/>
@@ -80,9 +80,10 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return{
-    fetchNewResource(resourceAttributes){
+    fetchNewResource(history){
       dispatch({
         type: 'FETCH_NEW_RESOURCE',
+        redirect: () => history.push('/my-resources')
       })
     },
     updateNewResource(languageIndex, key, value){
@@ -101,11 +102,6 @@ const mapDispatchToProps = (dispatch) => {
         type: 'TOGGLE_CATEGORY',
         payload: categoryID
       })
-    },
-    fetchNewResource(){
-      dispatch({
-        type: 'FETCH_NEW_RESOURCE'
-      })
     }
   }
 }
@@ -113,4 +109,4 @@ const mapDispatchToProps = (dispatch) => {
 
 
 
-export default connect(mapStateToProps, mapDispatchToProps) (ResourceForm)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps) (ResourceForm))
